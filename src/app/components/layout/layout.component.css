@@ -1,0 +1,133 @@
+/* Importación de la fuente Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
+
+:host {
+  font-family: "Poppins", sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.sidebar {
+  width: 160px; /* Reducido a 160px para un diseño más compacto */
+  background-color: #3f51b5;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  height: 100vh;
+  transition: width 0.3s;
+  font-family: "Poppins", sans-serif; /* Aplicación de la fuente Poppins */
+}
+
+.sidebar.collapsed {
+  width: 60px; /* Reducido a 60px para un diseño más compacto */
+  padding: 20px 5px;
+  align-items: center;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Justificar espacio entre logo y botón */
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  max-width: 35%;
+  height: auto;
+  margin-right: 10px; /* Espacio entre el logo y el texto "SGN" */
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.sidebar ul li {
+  margin-bottom: 20px;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px; /* Reducido el tamaño de la fuente */
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s;
+  width: 100%;
+  font-family: "Poppins", sans-serif; /* Aplicación de la fuente Poppins a los textos de los botones */
+}
+
+.sidebar ul li a fa-icon {
+  margin-right: 8px; /* Reducido el espacio entre el icono y el texto */
+}
+
+.sidebar.collapsed ul li a {
+  justify-content: center; /* Centra los iconos cuando el menú está contraído */
+  padding: 10px 0; /* Elimina el padding a la derecha en versión contraída */
+}
+
+.sidebar ul li a:hover {
+  background-color: #303f9f;
+  color: #fff;
+  width: auto;
+}
+
+/* Nueva clase para el enlace activo */
+.sidebar ul li a.active-link {
+  background-color: #1e88e5;
+  color: white;
+  width: auto; /* Mantener el ancho completo del enlace */
+}
+
+.content {
+  margin-left: 160px; /* Ajustado al nuevo ancho de la sidebar */
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #f0f2f5;
+  overflow-y: auto;
+  box-sizing: border-box;
+  transition: margin-left 0.3s;
+}
+
+.content.collapsed-content {
+  margin-left: 60px; /* Ajustado al nuevo ancho de la sidebar cuando está contraída */
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 25px; /* Reducido el tamaño del icono */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: justify-content 0.3s;
+}
+
+.sidebar.collapsed .toggle-button {
+  justify-content: center; /* Alinea el botón con los iconos cuando el menú está contraído */
+}

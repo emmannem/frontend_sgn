@@ -1,0 +1,74 @@
+<div class="container">
+  <nav [class.collapsed]="isCollapsed" class="sidebar">
+    <div class="top-bar">
+      <div class="logo-container" *ngIf="!isCollapsed">
+        <img src="../../../assets/logo.png" alt="Logo" class="logo" />
+        <span class="logo-text">SGN</span>
+      </div>
+      <button
+        [class.collapsed]="isCollapsed"
+        class="toggle-button"
+        (click)="toggleMenu()"
+      >
+        <fa-icon [icon]="faBars"></fa-icon>
+      </button>
+    </div>
+    <ul>
+      <li *ngIf="userRole === 'administrador' || userRole === 'ayudante'">
+        <a
+          routerLink="/home"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <fa-icon [icon]="faHome"></fa-icon>
+          <span *ngIf="!isCollapsed">Home</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador'">
+        <a routerLink="/personal" routerLinkActive="active-link">
+          <fa-icon [icon]="faUser"></fa-icon>
+          <span *ngIf="!isCollapsed">Personal</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador'">
+        <a routerLink="/productos" routerLinkActive="active-link">
+          <fa-icon [icon]="faBox"></fa-icon>
+          <span *ngIf="!isCollapsed">Productos</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador'">
+        <a routerLink="/ingredientes" routerLinkActive="active-link">
+          <fa-icon [icon]="faLeaf"></fa-icon>
+          <span *ngIf="!isCollapsed">Ingredientes</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador'">
+        <a routerLink="/servicios" routerLinkActive="active-link">
+          <fa-icon [icon]="faConciergeBell"></fa-icon>
+          <span *ngIf="!isCollapsed">Servicios</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador' || userRole === 'ayudante'">
+        <a routerLink="/cuentas" routerLinkActive="active-link">
+          <fa-icon [icon]="faMoneyCheckAlt"></fa-icon>
+          <span *ngIf="!isCollapsed">Cuentas</span>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'administrador' || userRole === 'ayudante'">
+        <a routerLink="/existencias" routerLinkActive="active-link">
+          <fa-icon [icon]="faBoxes"></fa-icon>
+          <span *ngIf="!isCollapsed">Existencias</span>
+        </a>
+      </li>
+      <li>
+        <a (click)="logout()">
+          <fa-icon [icon]="faSignOutAlt"></fa-icon>
+          <span *ngIf="!isCollapsed">Salir</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div [class.collapsed-content]="isCollapsed" class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
