@@ -338,9 +338,11 @@ export class ProductosComponent implements OnInit {
 
     // Llenar las tarifas del servicio seleccionado
     producPre.receta.forEach(ing_rec => {
+      console.log(this.ingredientes.indexOf(ing_rec.ingrediente))
+      const elementoEncontrado: number | string | undefined = this.ingredientes.findIndex(elemento => elemento.id_ingrediente === ing_rec.ingrediente.id_ingrediente);
       const recetaForm = this.fb.group({
         cantidad: [ing_rec.cantidad, Validators.required],
-        ingrediente: [ing_rec.ingrediente.nombre, Validators.required]
+        ingrediente: [this.ingredientes[elementoEncontrado], Validators.required]
       });
       this.receta.push(recetaForm);
     });
