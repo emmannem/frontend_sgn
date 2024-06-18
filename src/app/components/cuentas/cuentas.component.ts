@@ -8,6 +8,7 @@ import { Servicio } from 'src/app/models/servicio';
 import { ServiciosService } from 'src/app/services/servicios.service';
 import { Producto } from 'src/app/models/producto';
 import { ProductoService } from 'src/app/services/producto.service';
+import { ProductoPreparado } from 'src/app/models/producto-preparado';
 
 @Component({
   selector: 'app-cuentas',
@@ -18,7 +19,7 @@ export class CuentasComponent implements OnInit {
   displayedColumns: string[] = ['titular', 'fecha_apert', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<Cuenta>();
   productos: Producto[] = [];
-  productosPreparados: Producto[] = [];
+  productosPreparados: ProductoPreparado[] = [];
   servicios: Servicio[] = [];
   showRegisterForm: boolean = false;
   showAddServicioForm: boolean = false;
@@ -84,7 +85,7 @@ export class CuentasComponent implements OnInit {
 
   loadProductosPreparados(): void {
     this.productoService.getProductosPreparados().subscribe({
-      next: (data: Producto[]) => {
+      next: (data: ProductoPreparado[]) => {
         this.productosPreparados = data.filter(
           (producto) => producto.estado === 'ACTIVO'
         );
