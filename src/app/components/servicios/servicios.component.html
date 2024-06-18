@@ -1,1 +1,166 @@
-<p>servicios works!</p>
+<div class="container">
+    <div class="card">
+        <h2>Lista de Servicios</h2>
+        <div class="button-container">
+            <button mat-raised-button color="primary" (click)="openRegisterForm()">
+                Nuevo Servicio
+            </button>
+        </div>
+
+        <div *ngIf="showRegisterForm" class="register-form-overlay">
+            <div class="register-form-container">
+                <h2>{{ editMode ? "Editar" : "Registrar" }} Servicio</h2>
+                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                    <div class="form-grid">
+                        <div class="form-grid-item">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Nombre</mat-label>
+                                <input matInput formControlName="nombre" required />
+                            </mat-form-field>
+                        </div>
+                        <div></div>
+                        <!-- Central gap -->
+                        <div class="form-grid-item">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Descripción</mat-label>
+                                <textarea matInput formControlName="descripcion" required></textarea>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <!-- <div class="form-grid-item">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Unidad de Medida</mat-label>
+                            <mat-select formControlName="unidad_medida" required>
+                                <mat-option *ngFor="let unidad of unidad_tarifas" [value]="unidad">
+                                    {{ unidad }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div> -->
+                    <h3>Tarifas</h3>
+                    <div formArrayName="tarifas">
+                        <div *ngFor="let tarifa of tarifas.controls; let i=index" [formGroupName]="i" class="form-grid">
+                            <div class="form-grid-item">
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Precio Base</mat-label>
+                                    <input matInput formControlName="precio_base" required />
+                                </mat-form-field>
+                            </div>
+                            <div class="form-grid-item" style="
+    width: 205px;">
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Unidad de Facturación</mat-label>
+                                    <mat-select formControlName="unidad_facturacion" required>
+                                        <mat-option *ngFor="let unidad of unidad_tarifas" [value]="unidad">
+                                            {{ unidad }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <!-- <input matInput formControlName="unidad_facturacion" required /> -->
+                                </mat-form-field>
+                            </div>
+                            <div class="form-grid-item" style="
+    padding-left: 115px;">
+                                <button mat-icon-button color="warn" (click)="removeTarifa(i)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button mat-raised-button color="accent" (click)="addTarifa()" type="button">Agregar Tarifa</button>
+
+                    <div class="form-actions">
+                        <button mat-button type="button" class="cancel" (click)="closeRegisterForm()">Cancelar</button>
+                        <button mat-button type="submit" color="primary">{{ editMode ? "Actualizar" : "Registrar"
+                            }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para agregar stock -->
+        <!-- <div *ngIf="showAddStockForm" class="register-form-overlay">
+            <div class="register-form-container">
+                <h2>Agregar Stock</h2>
+                <form [formGroup]="addStockForm" (ngSubmit)="onAddStockSubmit()">
+                    <div class="form-grid">
+                        <div class="form-grid-item">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Cantidad de Stock a Agregar</mat-label>
+                                <input matInput formControlName="agregar_stock" type="number" required />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button mat-button type="button" class="cancel" (click)="closeAddStockForm()">
+                            Cancelar
+                        </button>
+                        <button mat-button type="submit" color="primary">
+                            Agregar Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div> -->
+
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                <ng-container matColumnDef="nombre">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.nombre }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="descripcion">
+                    <th mat-header-cell *matHeaderCellDef>Descripcion</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+
+                        {{ ingrediente.descripcion }}
+                    </td>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="unidad_medida">
+                    <th mat-header-cell *matHeaderCellDef>Unidad de Medida</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.unidad_medida }}
+                    </td>
+                </ng-container> -->
+                <ng-container matColumnDef="tarifas">
+                    <th mat-header-cell *matHeaderCellDef>Tarifas</th>
+                    <td mat-cell *matCellDef="let service">
+                        <ul>
+                            <li *ngFor="let tarifa of service.tarifas">
+                                Precio base: {{ tarifa.precio_base }} - Facturación: {{
+                                tarifa.unidad_facturacion }}
+                            </li>
+                        </ul>
+                    </td>
+                </ng-container>
+
+
+
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        <button mat-icon-button color="primary" (click)="editIngrediente(ingrediente)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteIngrediente(ingrediente)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <!-- <button mat-icon-button class="green-button" (click)="activateIngrediente(ingrediente)">
+                            <mat-icon>check_circle</mat-icon>
+                        </button> -->
+
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+
+            <div *ngIf="dataSource.data.length === 0" class="empty-state">
+                No hay ingredientes disponibles.
+            </div>
+        </div>
+    </div>
+</div>
