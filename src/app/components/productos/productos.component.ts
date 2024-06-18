@@ -55,7 +55,7 @@ export class ProductosComponent implements OnInit {
     });
 
     this.addStockForm = this.fb.group({
-      agregar_stock: ['', [Validators.required, Validators.min(1)]],
+      stock: ['', [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -140,7 +140,7 @@ export class ProductosComponent implements OnInit {
         this.productoService
           .updateProducto(this.currentProductoId, productData)
           .subscribe({
-            next: () => {
+            next: (data: Producto) => {
               this.snackBar.open(
                 'Producto actualizado exitosamente',
                 'Cerrar',
@@ -182,11 +182,15 @@ export class ProductosComponent implements OnInit {
 
   onAddStockSubmit(): void {
     if (this.addStockForm.valid && this.currentProductoId) {
+      const stockData = {
+        stock: parseInt(this.addStockForm.value.stock, 10),
+      };
+
       this.productoService
-        .addStock(this.currentProductoId, this.addStockForm.value)
+        .addStock(this.currentProductoId, stockData)
         .subscribe({
           next: () => {
-            this.snackBar.open('Stock agregado exitosamente', 'Cerrar', {
+            this.snackBar.open('Producto actualizado correctamente', 'Cerrar', {
               duration: 3000,
             });
             this.loadProductos();
@@ -211,15 +215,15 @@ export class ProductosComponent implements OnInit {
       nombre: producto.nombre,
       descripcion: producto.descripcion,
       SKU: producto.SKU,
-      precio: producto.precio,
-      stock: producto.inventario.stock,
+      precio: producto.precio.toString(),
+      stock: producto.inventario.stock.toString(),
     });
   }
 
   deleteProducto(producto: Producto): void {
     this.productoService.deleteProducto(producto.id_producto).subscribe({
-      next: (response) => {
-        this.snackBar.open(response, 'Cerrar', {
+      next: () => {
+        this.snackBar.open('Producto inhabilitado exitosamente', 'Cerrar', {
           duration: 3000,
         });
         this.loadProductos();
