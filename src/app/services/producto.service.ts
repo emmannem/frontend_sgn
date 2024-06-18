@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Producto } from '../models/producto';
+import { ProductoPreparado } from '../models/producto-preparado';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,7 @@ export class ProductoService {
     }),
   };
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) { }
 
   getProductos(): Observable<Producto[]> {
     return this.http
@@ -28,9 +29,9 @@ export class ProductoService {
       .pipe(catchError(this.handleError.bind(this)));
   }
 
-  getProductosPreparados(): Observable<Producto[]> {
+  getProductosPreparados(): Observable<ProductoPreparado[]> {
     return this.http
-      .get<Producto[]>(`${this.apiUrl}/productos/preparados`, this.httpOptions)
+      .get<ProductoPreparado[]>(`${this.apiUrl}/productos/preparados`, this.httpOptions)
       .pipe(catchError(this.handleError.bind(this)));
   }
 
@@ -39,10 +40,34 @@ export class ProductoService {
       .post<Producto>(`${this.apiUrl}/productos`, data, this.httpOptions)
       .pipe(catchError(this.handleError.bind(this)));
   }
+  registerProductoPreparado(data: ProductoPreparado): Observable<ProductoPreparado> {
+    const { receta, nombre, descripcion, precio } = data
+    const recetacast = receta.map((ing) => {
+      return {
+        id_ingrediente: ing.ingrediente.id_ingrediente,
+        cantidad_usada: ing.cantidad
+      }
+    })
+    const r = {
+      nombre,
+      descripcion,
+      precio: parseFloat(precio),
+      receta: recetacast
+    }
+    return this.http
+      .post<ProductoPreparado>(`${this.apiUrl}/productos`, r, this.httpOptions)
+      .pipe(catchError(this.handleError.bind(this)));
+  }
 
   updateProducto(id: string, data: Partial<Producto>): Observable<Producto> {
     return this.http
       .patch<Producto>(`${this.apiUrl}/productos/${id}`, data, this.httpOptions)
+      .pipe(catchError(this.handleError.bind(this)));
+  }
+
+  updateProductoPreparado(id: string, data: Partial<ProductoPreparado>): Observable<ProductoPreparado> {
+    return this.http
+      .patch<ProductoPreparado>(`${this.apiUrl}/productos/${id}`, data, this.httpOptions)
       .pipe(catchError(this.handleError.bind(this)));
   }
 

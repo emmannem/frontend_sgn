@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { Ingrediente } from 'src/app/models/ingrediente';
 import { Producto } from 'src/app/models/producto';
+import { ProductoPreparado } from 'src/app/models/producto-preparado';
 import { IngredienteService } from 'src/app/services/ingrediente.service';
 import { ProductoService } from 'src/app/services/producto.service';
 
@@ -31,17 +32,29 @@ export class ProductosComponent implements OnInit {
     'estado',
     'acciones',
   ];
+
+  get receta(): FormArray {
+    return this.registerFormPreparado.get('receta') as FormArray;
+  }
+  removeIngReceta(index: number): void {
+    this.receta.removeAt(index);
+  }
+
   dataSource = new MatTableDataSource<Producto>();
-  dataSourcePreparados = new MatTableDataSource<Producto>();
+  dataSourcePreparados = new MatTableDataSource<ProductoPreparado>();
   showingProductos = true;
   showRegisterForm: boolean = false;
+  showRegisterFormPrepardos: boolean = false;
+  registerFormPreparado: FormGroup;
   showAddStockForm: boolean = false;
   registerForm: FormGroup;
   addStockForm: FormGroup;
   editMode: boolean = false;
   currentProductoId: string | null = null;
+  ingredientes: Ingrediente[] = []
 
   constructor(
+    private ingredienteService: IngredienteService,
     private productoService: ProductoService,
     private snackBar: MatSnackBar,
     private fb: FormBuilder
@@ -53,6 +66,12 @@ export class ProductosComponent implements OnInit {
       precio: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
     });
+    this.registerFormPreparado = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      precio: ['', [Validators.required, Validators.min(0)]],
+      receta: this.fb.array([]),
+    });
 
     this.addStockForm = this.fb.group({
       stock: ['', [Validators.required, Validators.min(1)]],
@@ -61,6 +80,21 @@ export class ProductosComponent implements OnInit {
 
   ngOnInit() {
     this.loadProductos();
+    this.loadIngredientes();
+  }
+
+  loadIngredientes(): void {
+    this.ingredienteService.getIngredientes().subscribe({
+      next: (data: Ingrediente[]) => {
+        this.ingredientes = data;
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error al cargar los ingredientes', 'Cerrar', {
+          duration: 3000,
+        });
+      },
+    });
   }
 
   loadProductos(): void {
@@ -79,7 +113,7 @@ export class ProductosComponent implements OnInit {
 
   loadProductosPreparados(): void {
     this.productoService.getProductosPreparados().subscribe({
-      next: (data: Producto[]) => {
+      next: (data: ProductoPreparado[]) => {
         this.dataSourcePreparados.data = data;
       },
       error: (err) => {
@@ -112,9 +146,23 @@ export class ProductosComponent implements OnInit {
     this.registerForm.reset();
   }
 
+  openRegisterFormPrepa(): void {
+    this.showRegisterFormPrepardos = true;
+    this.editMode = false;
+    this.currentProductoId = null;
+    this.registerFormPreparado.reset();
+    this.receta.clear();
+  }
+
   closeRegisterForm(): void {
     this.showRegisterForm = false;
     this.registerForm.reset();
+  }
+
+
+  closeRegisterFormPrepa(): void {
+    this.showRegisterFormPrepardos = false;
+    this.registerFormPreparado.reset();
   }
 
   openAddStockForm(producto: Producto): void {
@@ -180,6 +228,57 @@ export class ProductosComponent implements OnInit {
     }
   }
 
+  onSubmitPreparado(): void {
+    if (this.registerFormPreparado.valid) {
+      const productData = {
+        ...this.registerFormPreparado.value,
+        precio: parseFloat(this.registerFormPreparado.value.precio),
+      };
+
+      if (this.editMode && this.currentProductoId) {
+        this.productoService
+          .updateProductoPreparado(this.currentProductoId, productData)
+          .subscribe({
+            next: (data: ProductoPreparado) => {
+              this.snackBar.open(
+                'Producto actualizado exitosamente',
+                'Cerrar',
+                {
+                  duration: 3000,
+                }
+              );
+              this.loadProductosPreparados();
+              this.registerFormPreparado.reset();
+              this.closeRegisterFormPrepa();
+            },
+            error: (err) => {
+              console.error(err);
+              this.snackBar.open('Error al actualizar el producto', 'Cerrar', {
+                duration: 3000,
+              });
+            },
+          });
+      } else {
+        this.productoService.registerProductoPreparado(productData).subscribe({
+          next: (data: ProductoPreparado) => {
+            this.snackBar.open('Producto registrado exitosamente', 'Cerrar', {
+              duration: 3000,
+            });
+            this.loadProductosPreparados();
+            this.registerFormPreparado.reset();
+            this.closeRegisterFormPrepa();
+          },
+          error: (err) => {
+            console.error(err);
+            this.snackBar.open('Error al registrar el producto', 'Cerrar', {
+              duration: 3000,
+            });
+          },
+        });
+      }
+    }
+  }
+
   onAddStockSubmit(): void {
     if (this.addStockForm.valid && this.currentProductoId) {
       const stockData = {
@@ -220,6 +319,33 @@ export class ProductosComponent implements OnInit {
     });
   }
 
+
+  editProducPrepa(producPre: ProductoPreparado): void {
+    this.editMode = true;
+    this.showRegisterFormPrepardos = true;
+    this.currentProductoId = producPre.id_producto; // Asegúrate de tener la propiedad correcta para el ID del servicio
+
+    // Resetear el formulario y las tarifas
+    this.registerFormPreparado.reset();
+    this.receta.clear();
+
+    // Llenar el formulario con los datos del servicio seleccionado
+    this.registerFormPreparado.patchValue({
+      nombre: producPre.nombre,
+      descripcion: producPre.descripcion,
+      precio: producPre.precio
+    });
+
+    // Llenar las tarifas del servicio seleccionado
+    producPre.receta.forEach(ing_rec => {
+      const recetaForm = this.fb.group({
+        cantidad: [ing_rec.cantidad, Validators.required],
+        ingrediente: [ing_rec.ingrediente.nombre, Validators.required]
+      });
+      this.receta.push(recetaForm);
+    });
+  }
+
   deleteProducto(producto: Producto): void {
     this.productoService.deleteProducto(producto.id_producto).subscribe({
       next: () => {
@@ -235,6 +361,14 @@ export class ProductosComponent implements OnInit {
         });
       },
     });
+  }
+
+  addIngReceta(): void {
+    const recetaForm = this.fb.group({
+      cantidad: ["", Validators.required],
+      ingrediente: ["", Validators.required]
+    });
+    this.receta.push(recetaForm);
   }
 
   activateProducto(producto: Producto): void {
