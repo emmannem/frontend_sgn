@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,6 +17,8 @@ import { CuentasComponent } from './components/cuentas/cuentas.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ExistenciasComponent } from './components/existencias/existencias.component';
+import { MaterialModule } from './material/material.module';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,12 +39,8 @@ import { ExistenciasComponent } from './components/existencias/existencias.compo
     AppRoutingModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-bottom-right',
-      preventDuplicates: true,
-    }),
     FontAwesomeModule,
+    MaterialModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
