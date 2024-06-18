@@ -1,1 +1,167 @@
-<p>existencias works!</p>
+<div class="container">
+    <div class="card">
+        <h2>Gestión de Existencias</h2>
+        <div class="button-container">
+            <button mat-raised-button [ngClass]="{ 'active-button': showingProductos }" color="primary"
+                (click)="toggleView('productos')">
+                Productos
+            </button>
+            <button mat-raised-button [ngClass]="{ 'active-button': !showingProductos }" color="primary"
+                (click)="toggleView('ingredientes')">
+                Ingredientes
+            </button>
+        </div>
+
+        <!-- Modal para agregar stock -->
+        <div *ngIf="showAddStockForm" class="register-form-overlay">
+            <div class="register-form-container">
+                <h2>Agregar Stock</h2>
+                <form [formGroup]="addStockForm" (ngSubmit)="onAddStockSubmit()">
+                    <div class="form-grid">
+                        <div class="form-grid-item">
+                            <mat-form-field style="width: 432px;" appearance="fill">
+                                <mat-label>Cantidad de Stock a Agregar</mat-label>
+                                <input matInput formControlName="stock" type="number" required />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button mat-button type="button" class="cancel" (click)="closeAddStockForm()">
+                            Cancelar
+                        </button>
+                        <button mat-button type="submit" color="primary">
+                            Agregar Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-container" *ngIf="showingProductos">
+            <h2>Lista de Productos</h2>
+
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                <ng-container matColumnDef="nombre">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                    <td mat-cell *matCellDef="let producto">{{ producto.nombre }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="descripcion">
+                    <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                    <td mat-cell *matCellDef="let producto">
+                        {{ producto.descripcion }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="SKU">
+                    <th mat-header-cell *matHeaderCellDef>SKU</th>
+                    <td mat-cell *matCellDef="let producto">{{ producto.SKU }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="precio">
+                    <th mat-header-cell *matHeaderCellDef>Precio</th>
+                    <td mat-cell *matCellDef="let producto">{{ producto.precio }}</td>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="modified_at">
+                    <th mat-header-cell *matHeaderCellDef>Última Modificación</th>
+                    <td mat-cell *matCellDef="let producto">
+                        {{ producto.modified_at | date }}
+                    </td>
+                </ng-container> -->
+
+                <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let producto">{{ producto.estado }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="stock">
+                    <th mat-header-cell *matHeaderCellDef>Stock</th>
+                    <td mat-cell *matCellDef="let producto">
+                        {{ producto.inventario.stock }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td mat-cell *matCellDef="let producto">
+                        <!-- <button mat-icon-button color="primary" (click)="editProducto(producto)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteProducto(producto)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button mat-icon-button class="green-button" (click)="activateProducto(producto)">
+                            <mat-icon>check_circle</mat-icon>
+                        </button> -->
+                        <button mat-icon-button class="orange-button" (click)="openAddStockForm(producto)">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+
+            <div *ngIf="dataSource.data.length === 0" class="empty-state">
+                No hay productos disponibles.
+            </div>
+        </div>
+
+        <div class="table-container" *ngIf="!showingProductos">
+            <h2>Lista de Ingredientes</h2>
+            <table mat-table [dataSource]="dataSourceIngredientes" class="mat-elevation-z8">
+                <ng-container matColumnDef="nombre">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.nombre }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="unidad_medida">
+                    <th mat-header-cell *matHeaderCellDef>Unidad de Medida</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.unidad_medida }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stock">
+                    <th mat-header-cell *matHeaderCellDef>Stock</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.stock }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        {{ ingrediente.estado }}
+                    </td>
+                </ng-container>
+
+
+
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td mat-cell *matCellDef="let ingrediente">
+                        <!-- Aquí puedes agregar botones de acciones como editar y eliminar -->
+                        <button mat-icon-button class="orange-button" (click)="openAddStockFormIng(ingrediente)">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsIng"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsIng"></tr>
+            </table>
+
+            <div *ngIf="dataSourceIngredientes.data.length === 0" class="empty-state">
+                No hay Ingredientes disponibles.
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
